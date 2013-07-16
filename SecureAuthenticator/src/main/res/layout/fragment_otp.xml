@@ -15,8 +15,21 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/otp_section"
-            android:id="@+id/testView"
+            android:id="@+id/timeCounter"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="11dp" />
+
+    <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/timeProgress"
+            android:layout_below="@id/timeCounter"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:max="300"
+            android:progress="0"
+            android:indeterminate="false"/>
+
 </RelativeLayout>
