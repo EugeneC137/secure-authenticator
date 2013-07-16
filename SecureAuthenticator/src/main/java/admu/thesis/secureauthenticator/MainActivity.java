@@ -145,32 +145,4 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             return null;
         }
     }
-
-    public static class EnrollmentFragment extends Fragment {
-        public EnrollmentFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_enrollment, container, false);
-
-            return rootView;
-        }
-
-    }
-
-    public static class OTPFragment extends Fragment {
-        public OTPFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_otp, container, false);
-
-            return rootView;
-        }
-    }
-
 }
