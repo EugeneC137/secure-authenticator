@@ -64,9 +64,7 @@ public class OTPFragment extends Fragment implements Runnable{
                     });
                 }
 
-                progress = (int) ((newTime % 30000.0) / 30000 * 300);
-
-                System.out.println(progress);
+                progress = (int) ((newTime % 30000.0) / 30000 * 500);
 
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
@@ -75,7 +73,7 @@ public class OTPFragment extends Fragment implements Runnable{
                     }
                 });
 
-                Thread.sleep(500);
+                Thread.sleep(20); //Allow thread to sleep to reduce performance penalty
             }
         } catch(Exception e) {}
     }

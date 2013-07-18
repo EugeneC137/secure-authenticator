@@ -38,6 +38,9 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Force change the upper title
+        this.setTitle(getString(R.string.app_name));
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
