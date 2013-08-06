@@ -8,6 +8,12 @@ import android.support.v4.app.Fragment;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore;
+
+import javax.crypto.SecretKey;
+
 /**
  * Created by Ian on 7/16/13.
  */
@@ -17,14 +23,13 @@ public class OTPFragment extends Fragment implements Runnable{
     double newBaseTime;
     double newTime; //Always keeps track of current time;
 
-    double percent;
     int progress; //Progress until next 30 seconds
 
     ProgressBar timeProgress;
     TextView timeCounter; //Displays base time counter
 
-    public OTPFragment() {
-    }
+    String keyString;
+    byte[] key;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,25 +46,80 @@ public class OTPFragment extends Fragment implements Runnable{
     public void run() {
         try {
             baseTime = Math.floor(System.currentTimeMillis() / 30000);
+            OTPItem otpItem = (OTPItem) getActivity().getApplicationContext();
 
-            System.out.println(baseTime);
+            KeyStore seedStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            char[] keyPass = "some arbitrary password".toCharArray();
+            String fileName = "seedStore.bks";
+            try {
+                File file = getActivity().getApplicationContext().getFileStreamPath(fileName);
+                if(file.exists()) {
+                    FileInputStream fis = getActivity().getApplicationContext().openFileInput(fileName);
+                    seedStore.load(fis, keyPass);
+
+                    SecretKey getKey = (SecretKey)seedStore.getKey("otpSeed", keyPass);
+                    String keyString = new String(getKey.getEncoded(),"UTF-8");
+
+                    System.out.println(keyString);
+
+                    otpItem.setSeed(keyString);
+
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+            } finally {
+                keyString = otpItem.getSeed();
+                key = keyString.getBytes("UTF-8");
+            }
+
+            //Immediately set OTP upon thread start
+            getActivity().runOnUiThread( new Runnable() {
+                public void run() {
+                    timeCounter = (TextView) getActivity().findViewById(R.id.timeCounter);
+                    int otpValue = TOTP.generateTOTP(key, (long) baseTime * 30);
+                    String currTime = String.format("%.0f", baseTime * 30);
+
+                    String otp = Integer.valueOf(otpValue).toString();
+                    //Append any missing zeroes
+                    while(otp.length() < 6) {
+                        otp = "0".concat(otp);
+                    }
+                    timeCounter.setText(otp);
+
+                    System.out.println(currTime + ": " + otpValue);
+                }
+            });
             while(true) {
                 newTime = System.currentTimeMillis();
-
-                //System.out.println(newTime);
 
                 newBaseTime = Math.floor(newTime / 30000);
 
                 if(newBaseTime > baseTime) {
                     baseTime = newBaseTime;
 
-                    System.out.println(baseTime);
+                    //Make sure seed value is updated to the latest one
+                    keyString = otpItem.getSeed();
+                    key = keyString.getBytes("UTF-8");
+
+                    System.out.println("Outside Thread: " + keyString);
 
                     getActivity().runOnUiThread(new Runnable() {
 
                         public void run() {
+                            System.out.println("Inside Thread: " + keyString);
+
                             timeCounter = (TextView) getActivity().findViewById(R.id.timeCounter);
-                            timeCounter.setText(Double.valueOf(baseTime).toString());
+                            int otpValue = TOTP.generateTOTP(key, (long) baseTime * 30);
+                            String currTime = String.format("%.0f", baseTime * 30);
+
+                            String otp = Integer.valueOf(otpValue).toString();
+                            //Append any missing zeroes
+                            while (otp.length() < 6) {
+                                otp = "0".concat(otp);
+                            }
+                            timeCounter.setText(otp);
+
+                            System.out.println(currTime + ": " + otpValue);
                         }
                     });
                 }
@@ -75,6 +135,8 @@ public class OTPFragment extends Fragment implements Runnable{
 
                 Thread.sleep(20); //Allow thread to sleep to reduce performance penalty
             }
-        } catch(Exception e) {}
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 }

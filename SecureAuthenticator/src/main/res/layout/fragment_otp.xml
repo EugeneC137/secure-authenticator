@@ -10,26 +10,33 @@
               android:paddingBottom="@dimen/activity_vertical_margin"
               tools:context=".MainActivity$DummySectionFragment">
 
+    <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/timeProgress"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:max="500"
+            android:progress="0"
+            android:indeterminate="false"/>
+
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/otp_section"
             android:id="@+id/timeCounter"
-            android:layout_alignParentTop="true"
+            android:layout_below="@id/timeProgress"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="11dp" />
 
-    <ProgressBar
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="350dp"
+    <ListView
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/timeProgress"
-            android:layout_below="@id/timeCounter"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
-            android:max="500"
-            android:progress="0"
-            android:indeterminate="false"/>
+            android:id="@+id/otpList"
+            android:layout_below="@+id/timeCounter"
+            android:layout_marginTop="10dp"/>
+
 
 </RelativeLayout>

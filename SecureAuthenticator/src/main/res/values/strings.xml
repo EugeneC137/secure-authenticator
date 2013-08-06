@@ -7,14 +7,11 @@
     <string name="enroll_section">Enroll Account</string>
     <string name="otp_section">One-Time Passwords</string>
 
-    <string name="requestCode">Request Code</string>
-    <string name="login">Login</string>
-
-    <string name="step1">Step 1: Request a Secret Code</string>
-    <string name="step2">Step 2: Login via the App</string>
+    <string name="enrollment_guide">Submit your username and password to enable two-factor authentication for your account.</string>
 
     <string name="username">Username</string>
     <string name="password">Password</string>
-    <string name="otp">One-Time Password</string>
+
+    <string name="submit">Submit</string>
 
 </resources>
