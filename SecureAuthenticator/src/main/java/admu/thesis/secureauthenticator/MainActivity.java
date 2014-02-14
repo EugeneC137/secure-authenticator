@@ -1,9 +1,12 @@
 package admu.thesis.secureauthenticator;
 
+import java.io.File;
+import java.io.OutputStreamWriter;
 import java.util.Locale;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -11,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
+import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,9 +39,17 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
+    Menu menu;
+
+    public static final String disablePassword = "Disable Password";
+    public static final String enablePassword = "Enable Password";
+
+    OTPItem otpItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        otpItem = (OTPItem) getApplicationContext();
+
         //Force change the upper title
         this.setTitle(getString(R.string.app_name));
 
@@ -79,12 +91,88 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         }
     }
 
+    public void updateMenu() {
+        System.out.println("Chaning Menu Item");
+        MenuItem toggleMenuItem = menu.findItem(R.id.action_toggle);
+        if (otpItem.getPasswordEnabled()) {
+            toggleMenuItem.setTitle("Disable Password");
+        } else {
+            toggleMenuItem.setTitle("Enable Password");
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        this.menu = menu;
+        updateMenu();
         return true;
     }
+
+
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+
+        MenuItem toggleMenuItem = menu.findItem(R.id.action_toggle);
+        if (otpItem.getPasswordEnabled()) {
+            toggleMenuItem.setTitle("Disable Password");
+        } else {
+            toggleMenuItem.setTitle("Enable Password");
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_toggle:
+                //Toggle Password Settings
+                System.out.println("Password: " + otpItem.getAppPassword());
+                if(otpItem.getPasswordEnabled()) {
+                    try {
+                        String fileName = "login.dat";
+                        OutputStreamWriter out = new OutputStreamWriter(openFileOutput(fileName, 0));
+                        out.write("0\n"); //Disable Password Prompt
+                        out.write(otpItem.getAppPassword()); //Store the password in plaintext
+                        out.close();
+
+                        otpItem.setPasswordEnabled(false);
+                    } catch(Exception e) { e.printStackTrace(); }
+                } else {
+                    try {
+                        String hash = BCrypt.hashpw(otpItem.getAppPassword(),BCrypt.gensalt());
+                        System.out.println(hash);
+
+                        String fileName = "login.dat";
+                        OutputStreamWriter out = new OutputStreamWriter(openFileOutput(fileName, 0));
+                        out.write("1\n"); //Enable Password Prompt
+                        out.write(hash); //Store the password's bcrypt hash
+                        out.close();
+
+                        otpItem.setPasswordEnabled(true);
+                    } catch(Exception e) { e.printStackTrace(); }
+                }
+                updateMenu(); //Refresh Menu Item
+                return true;
+            case R.id.action_clear:
+                //Clear Data and Return to Login Page
+                try {
+                    File file = getApplicationContext().getFileStreamPath("login.dat");
+                    file.delete();
+                    File file2 = getApplicationContext().getFileStreamPath("seedStore.bks");
+                    file2.delete();
+
+                    Intent intent = new Intent(this, AppPasswordActivity.class);
+                    startActivity(intent);
+                    finish();
+                } catch(Exception e) { e.printStackTrace(); }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {

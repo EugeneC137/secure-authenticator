@@ -106,7 +106,7 @@ public class EnrollmentFragment extends Fragment{
 
             System.out.println("Setting Connection");
 
-            HttpPost httppost = new HttpPost("https://192.168.254.115:8443/SecureAuthenticatorServer/enroll");
+            HttpPost httppost = new HttpPost("https://192.168.0.150:8443/SecureAuthenticatorServer/enroll");
 
             //Add username and password to HTTP Post
             List<NameValuePair> values = new ArrayList<NameValuePair>(2);
@@ -137,7 +137,6 @@ public class EnrollmentFragment extends Fragment{
 
                 String seed = messages[1].substring(5,messages[1].length());
 
-                //Temporary storage as a variable in memory (for testing only)
                 OTPItem otpItem = (OTPItem) getActivity().getApplicationContext();
                 otpItem.setSeed(seed);
 
@@ -161,7 +160,8 @@ public class EnrollmentFragment extends Fragment{
                 */
 
                 seedStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                char[] newKeyPass = "some arbitrary password".toCharArray();
+                //seedStore = KeyStore.getInstance("UBER");
+                char[] newKeyPass = otpItem.getAppPassword().toCharArray();
                 seedStore.load(null, newKeyPass);
 
                 System.out.println("KeyStore Initialized");
@@ -178,6 +178,7 @@ public class EnrollmentFragment extends Fragment{
                     System.out.println(seedCopy);
 
                     String fileName = "seedStore.bks";
+                    //String fileName = "seedStore.ubr";
 
                     FileOutputStream fos = getActivity().getApplicationContext().openFileOutput(fileName, Context.MODE_PRIVATE);
                     seedStore.store(fos, newKeyPass);

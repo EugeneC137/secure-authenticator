@@ -25,18 +25,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/otp_section"
+            android:text="@string/pls_enroll"
             android:id="@+id/timeCounter"
             android:layout_below="@id/timeProgress"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="11dp" />
-
-    <ListView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/otpList"
-            android:layout_below="@+id/timeCounter"
-            android:layout_marginTop="10dp"/>
 
 
 </RelativeLayout>
